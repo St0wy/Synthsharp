@@ -1,6 +1,6 @@
 ﻿namespace Synthsharp
 {
-    partial class Form1
+    partial class SynthView
     {
         /// <summary>
         /// Variable nécessaire au concepteur.
@@ -28,10 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.SuspendLayout();
+            // 
+            // SynthView
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            this.Name = "SynthView";
+            this.Text = "Synthsharp";
+            this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.SynthView_KeyPress);
+            this.ResumeLayout(false);
+
         }
 
         #endregion

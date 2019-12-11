@@ -3,18 +3,94 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Synthsharp
 {
-    public partial class Form1 : Form
+    public partial class SynthView : Form
     {
-        public Form1()
+        private const int SAMPLE_RATE = 44100;
+        private const short BITS_PER_SAMPLE = 16;
+        private const float DEFAULT_FREQUENCY = 440f;
+        public SynthView()
         {
             InitializeComponent();
+        }
+
+        private void SynthView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            short[] wave = new short[SAMPLE_RATE];
+            float frequency = DEFAULT_FREQUENCY;
+            /* Algorithms are available at this address : https://blogs.msdn.microsoft.com/dawate/2009/06/25/intro-to-audio-programming-part-4-algorithms-for-different-sound-waves-in-c/ */
+
+            /* 
+            short.MaxValue is the Amplitude 
+            ((Math.PI * 2 * frequency) / SAMPLE_RATE) is the t (angular frequency)
+            i is itself (time unit) 
+            */
+
+            /* Sine wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                /* 
+                 Equation used 
+                 Sample = Amplitude * sin(t*i)
+                */
+
+                wave[i] = Convert.ToInt16(short.MaxValue * Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i));
+            }
+            /* Square wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                /* 
+                Equation used
+                Sample = Amplitude * sgn(sin(t * i)) 
+                */
+                wave[i] = Convert.ToInt16(short.MaxValue * Math.Sign(Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i)));
+            }
+
+            new SoundPlayer(createWave(wave)).Play();
+        }
+        /// <summary>
+        /// Create a sound in wave format
+        /// Encoding options for a .wav
+        ///     description available at this address : http://soundfile.sapp.org/doc/WaveFormat/
+        /// </summary>
+        /// <param name="binaryWriter"></param>
+        /// <returns>The MemoryStream encoded</returns>
+        public MemoryStream createWave(short[] wave)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            BinaryWriter binaryWriter = new BinaryWriter(memoryStream);
+
+            short sizeOfShort = sizeof(short);
+            byte[] binaryWave = new byte[SAMPLE_RATE * sizeOfShort];
+
+            Buffer.BlockCopy(wave, 0, binaryWave, 0, wave.Length * sizeOfShort);
+
+            short blockAlign = BITS_PER_SAMPLE / 8;
+            int subChunckTwoSize = SAMPLE_RATE * blockAlign;
+
+            binaryWriter.Write(new[] { 'R', 'I', 'F', 'F' });
+            binaryWriter.Write(36 + subChunckTwoSize);
+            binaryWriter.Write(new[] { 'W', 'A', 'V', 'E', 'f', 'm', 't', ' ' });
+            binaryWriter.Write(16);
+            binaryWriter.Write((short)1);
+            binaryWriter.Write((short)1);
+            binaryWriter.Write(SAMPLE_RATE);
+            binaryWriter.Write(SAMPLE_RATE * blockAlign);
+            binaryWriter.Write(blockAlign);
+            binaryWriter.Write(BITS_PER_SAMPLE);
+            binaryWriter.Write(new[] { 'd', 'a', 't', 'a' });
+            binaryWriter.Write(subChunckTwoSize);
+            binaryWriter.Write(binaryWave);
+            memoryStream.Position = 0;
+            return memoryStream;
         }
     }
 }
