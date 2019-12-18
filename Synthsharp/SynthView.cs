@@ -17,9 +17,13 @@ namespace Synthsharp
         private const int SAMPLE_RATE = 44100;
         private const short BITS_PER_SAMPLE = 16;
         private const float DEFAULT_FREQUENCY = 440f;
+
+        MidiHandler midiHandler;
+
         public SynthView()
         {
             InitializeComponent();
+            midiHandler = new MidiHandler(0);
         }
 
         private void SynthView_KeyPress(object sender, KeyPressEventArgs e)
