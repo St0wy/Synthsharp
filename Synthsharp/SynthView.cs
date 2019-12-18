@@ -58,6 +58,32 @@ namespace Synthsharp
                 wave[i] = Convert.ToInt16(short.MaxValue * Math.Sign(Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i)));
             }
 
+            short tmpSample = -short.MaxValue;
+            int samplesPerWaveLength = (int)(SAMPLE_RATE / frequency);
+            short ampStep = (short)((short.MaxValue * 2) / samplesPerWaveLength);
+
+            /* Triangle wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                /* Used to reset the slope */
+                if (Math.Abs(tmpSample + ampStep) > short.MaxValue)
+                {
+                    ampStep = (short)-ampStep;
+                }
+                tmpSample += ampStep;
+                wave[i] = tmpSample;
+            }
+            /* Sawtooth wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                for (int j = 0; j < samplesPerWaveLength && i < SAMPLE_RATE; j++)
+                {
+                    tmpSample += ampStep;
+                    wave[i++] = Convert.ToInt16(tmpSample);
+                }
+                i--;
+            }
+
             new SoundPlayer(createWave(wave)).Play();
         }
         /// <summary>
