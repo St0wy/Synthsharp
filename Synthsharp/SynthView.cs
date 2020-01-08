@@ -32,6 +32,7 @@ namespace Synthsharp
         {
             InitializeComponent();
             InitializeComboBox(new ComboBox[] { cbxOscillator1, cbxOscillator2, cbxOscillator3 }, DEFAULT_COMBO_BOX);
+            this.KeyPreview = true; /* Very important to prevent focus on controls */
         }
         /// <summary>
         /// Create a sound in wave format
@@ -83,34 +84,14 @@ namespace Synthsharp
             }
         }
 
-        //private void cbxOscillator1_SelectedIndexChanged(object sender, EventArgs e)
-        //{
-        //    int index = cbxOscillator1.SelectedIndex;
-        //    switch (index)
-        //    {
-        //        case (int)SelectedWave.Sine:
-
-        //            break;
-        //        case (int)SelectedWave.Square:
-
-        //            break;
-        //        case (int)SelectedWave.Sawtooth:
-
-        //            break;
-        //        case (int)SelectedWave.Triangle:
-
-        //            break;
-        //        case (int)SelectedWave.Noise:
-
-        //            break;
-        //        default:
-        //            break;
-
-        //    }
-        //}
+        private void cbxOscillator1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+        }
 
         private void SynthView_KeyDown(object sender, KeyEventArgs e)
         {
+           
             short[] wave = new short[SAMPLE_RATE];
             float frequency = DEFAULT_FREQUENCY;
 
@@ -158,43 +139,64 @@ namespace Synthsharp
             i is itself (time unit) 
             */
 
-            /* Sine wave */
-            for (int i = 0; i < SAMPLE_RATE; i++)
+
+            int index = cbxOscillator1.SelectedIndex;
+            switch (index)
             {
-                wave[i] = Convert.ToInt16(short.MaxValue * Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i));
-            }
-            /* Square wave */
-            for (int i = 0; i < SAMPLE_RATE; i++)
-            {
-                wave[i] = Convert.ToInt16(short.MaxValue * Math.Sign(Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i)));
+                case (int)SelectedWave.Sine:
+                    /* Sine wave */
+                    for (int i = 0; i < SAMPLE_RATE; i++)
+                    {
+                        wave[i] = Convert.ToInt16(short.MaxValue * Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i));
+                    }
+                    break;
+                case (int)SelectedWave.Square:
+                    /* Square wave */
+                    for (int i = 0; i < SAMPLE_RATE; i++)
+                    {
+                        wave[i] = Convert.ToInt16(short.MaxValue * Math.Sign(Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i)));
+                    }
+                    break;
+                case (int)SelectedWave.Sawtooth:
+                    /* Triangle wave */
+                    for (int i = 0; i < SAMPLE_RATE; i++)
+                    {
+                        /* Used to reset the slope */
+                        if (Math.Abs(tmpSample + ampStep) > short.MaxValue)
+                        {
+                            ampStep = (short)-ampStep;
+                        }
+                        tmpSample += ampStep;
+                        wave[i] = tmpSample;
+                    }
+                    break;
+                case (int)SelectedWave.Triangle:
+                    /* Sawtooth wave */
+                    for (int i = 0; i < SAMPLE_RATE; i++)
+                    {
+                        for (int j = 0; j < samplesPerWaveLength && i < SAMPLE_RATE; j++)
+                        {
+                            tmpSample += ampStep;
+                            wave[i++] = Convert.ToInt16(tmpSample);
+                        }
+                        i--;
+                    }
+                    break;
+                case (int)SelectedWave.Noise:
+                    /* Noise wave */
+                    for (int i = 0; i < SAMPLE_RATE; i++)
+                    {
+                        wave[i] = (short)rdm.Next(-short.MaxValue, short.MaxValue);
+                    }
+                    break;
+                default:
+                    break;
+
             }
 
-            /* Triangle wave */
-            for (int i = 0; i < SAMPLE_RATE; i++)
-            {
-                /* Used to reset the slope */
-                if (Math.Abs(tmpSample + ampStep) > short.MaxValue)
-                {
-                    ampStep = (short)-ampStep;
-                }
-                tmpSample += ampStep;
-                wave[i] = tmpSample;
-            }
-            /* Sawtooth wave */
-            for (int i = 0; i < SAMPLE_RATE; i++)
-            {
-                for (int j = 0; j < samplesPerWaveLength && i < SAMPLE_RATE; j++)
-                {
-                    tmpSample += ampStep;
-                    wave[i++] = Convert.ToInt16(tmpSample);
-                }
-                i--;
-            }
-            /* Noise wave */
-            for (int i = 0; i < SAMPLE_RATE; i++)
-            {
-                wave[i] = (short)rdm.Next(-short.MaxValue, short.MaxValue);
-            }
+
+
+
 
             new SoundPlayer(createWave(wave)).Play();
         }

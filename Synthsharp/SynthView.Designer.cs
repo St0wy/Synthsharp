@@ -136,12 +136,13 @@
             // cbxOscillator1
             // 
             this.cbxOscillator1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxOscillator1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.cbxOscillator1.FormattingEnabled = true;
             this.cbxOscillator1.Location = new System.Drawing.Point(6, 36);
             this.cbxOscillator1.Name = "cbxOscillator1";
             this.cbxOscillator1.Size = new System.Drawing.Size(121, 21);
             this.cbxOscillator1.TabIndex = 0;
-           // this.cbxOscillator1.SelectedIndexChanged += new System.EventHandler(this.cbxOscillator1_SelectedIndexChanged);
+            this.cbxOscillator1.SelectedIndexChanged += new System.EventHandler(this.cbxOscillator1_SelectedIndexChanged);
             // 
             // groupbox2
             // 
@@ -222,6 +223,7 @@
             // cbxOscillator2
             // 
             this.cbxOscillator2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxOscillator2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.cbxOscillator2.FormattingEnabled = true;
             this.cbxOscillator2.Location = new System.Drawing.Point(6, 36);
             this.cbxOscillator2.Name = "cbxOscillator2";
@@ -307,6 +309,7 @@
             // cbxOscillator3
             // 
             this.cbxOscillator3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbxOscillator3.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.cbxOscillator3.FormattingEnabled = true;
             this.cbxOscillator3.Location = new System.Drawing.Point(6, 36);
             this.cbxOscillator3.Name = "cbxOscillator3";
