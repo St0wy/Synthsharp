@@ -9,6 +9,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Commons.Music.Midi;
 
 namespace Synthsharp
 {
@@ -18,12 +19,9 @@ namespace Synthsharp
         private const short BITS_PER_SAMPLE = 16;
         private const float DEFAULT_FREQUENCY = 440f;
 
-        MidiHandler midiHandler;
-
         public SynthView()
         {
             InitializeComponent();
-            midiHandler = new MidiHandler(0);
         }
 
         private void SynthView_KeyPress(object sender, KeyPressEventArgs e)
@@ -84,7 +82,7 @@ namespace Synthsharp
                 i--;
             }
 
-            new SoundPlayer(createWave(wave)).Play();
+            new SoundPlayer(CreateWave(wave)).Play();
         }
         /// <summary>
         /// Create a sound in wave format
@@ -93,7 +91,7 @@ namespace Synthsharp
         /// </summary>
         /// <param name="binaryWriter"></param>
         /// <returns>The MemoryStream encoded</returns>
-        public MemoryStream createWave(short[] wave)
+        public MemoryStream CreateWave(short[] wave)
         {
             MemoryStream memoryStream = new MemoryStream();
             BinaryWriter binaryWriter = new BinaryWriter(memoryStream);
@@ -121,6 +119,22 @@ namespace Synthsharp
             binaryWriter.Write(binaryWave);
             memoryStream.Position = 0;
             return memoryStream;
+        }
+
+        private void SynthView_Load(object sender, EventArgs e)
+        {
+
+            string port = null;
+            IMidiAccess access = MidiAccessManager.Default;
+            IMidiPortDetails iport = access.Inputs.FirstOrDefault(i => i.Id == port) ?? access.Inputs.Last();
+            IMidiInput input = access.OpenInputAsync(iport.Id).Result;
+            
+            input.MessageReceived += MessageRecieved;
+        }
+
+        private void MessageRecieved(object obj, MidiReceivedEventArgs e)
+        {
+
         }
     }
 }
