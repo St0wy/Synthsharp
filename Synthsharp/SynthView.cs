@@ -100,6 +100,7 @@ namespace Synthsharp
             short tmpSample = -short.MaxValue;
             int samplesPerWaveLength = (int)(SAMPLE_RATE / frequency);
             short ampStep = (short)((short.MaxValue * 2) / samplesPerWaveLength);
+            short amplitude = (short)trbOscillator1.Value;
 
             /* Frenquencies available at this address : https://en.wikipedia.org/wiki/Piano_key_frequencies (using C2 to C8)*/
             switch (e.KeyCode)
@@ -119,85 +120,19 @@ namespace Synthsharp
                 case Keys.B:
                     frequency = FREQUENCY_FOR_C6_NOTE;
                     break;
-                case Keys.N:
+                case Keys.H:
                     frequency = FREQUENCY_FOR_C7_NOTE;
                     break;
                 case Keys.M:
                     frequency = FREQUENCY_FOR_C8_NOTE;
                     break;
                 default:
-
                     break;
             }
-
-
-            /* Algorithms are available at this address : https://blogs.msdn.microsoft.com/dawate/2009/06/25/intro-to-audio-programming-part-4-algorithms-for-different-sound-waves-in-c/ */
-
-            /* 
-            short.MaxValue is the Amplitude 
-            ((Math.PI * 2 * frequency) / SAMPLE_RATE) is the t (angular frequency)
-            i is itself (time unit) 
-            */
-
+            Oscillator o = new Oscillator(wave, frequency, rdm, tmpSample, samplesPerWaveLength, ampStep, amplitude);
 
             int index = cbxOscillator1.SelectedIndex;
-            switch (index)
-            {
-                case (int)SelectedWave.Sine:
-                    /* Sine wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        wave[i] = Convert.ToInt16(short.MaxValue * Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i));
-                    }
-                    break;
-                case (int)SelectedWave.Square:
-                    /* Square wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        wave[i] = Convert.ToInt16(short.MaxValue * Math.Sign(Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i)));
-                    }
-                    break;
-                case (int)SelectedWave.Sawtooth:
-                    /* Triangle wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        /* Used to reset the slope */
-                        if (Math.Abs(tmpSample + ampStep) > short.MaxValue)
-                        {
-                            ampStep = (short)-ampStep;
-                        }
-                        tmpSample += ampStep;
-                        wave[i] = tmpSample;
-                    }
-                    break;
-                case (int)SelectedWave.Triangle:
-                    /* Sawtooth wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        for (int j = 0; j < samplesPerWaveLength && i < SAMPLE_RATE; j++)
-                        {
-                            tmpSample += ampStep;
-                            wave[i++] = Convert.ToInt16(tmpSample);
-                        }
-                        i--;
-                    }
-                    break;
-                case (int)SelectedWave.Noise:
-                    /* Noise wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        wave[i] = (short)rdm.Next(-short.MaxValue, short.MaxValue);
-                    }
-                    break;
-                default:
-                    break;
-
-            }
-
-
-
-
-
+            o.ConstructWave(index);
             new SoundPlayer(createWave(wave)).Play();
         }
     }
