@@ -9,6 +9,7 @@ using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Commons.Music.Midi;
 
 namespace Synthsharp
 {
@@ -31,6 +32,67 @@ namespace Synthsharp
         public SynthView()
         {
             InitializeComponent();
+        }
+
+        private void SynthView_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            short[] wave = new short[SAMPLE_RATE];
+            float frequency = DEFAULT_FREQUENCY;
+            /* Algorithms are available at this address : https://blogs.msdn.microsoft.com/dawate/2009/06/25/intro-to-audio-programming-part-4-algorithms-for-different-sound-waves-in-c/ */
+
+            /* 
+            short.MaxValue is the Amplitude 
+            ((Math.PI * 2 * frequency) / SAMPLE_RATE) is the t (angular frequency)
+            i is itself (time unit) 
+            */
+
+            /* Sine wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                /* 
+                 Equation used 
+                 Sample = Amplitude * sin(t*i)
+                */
+
+                wave[i] = Convert.ToInt16(short.MaxValue * Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i));
+            }
+            /* Square wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                /* 
+                Equation used
+                Sample = Amplitude * sgn(sin(t * i)) 
+                */
+                wave[i] = Convert.ToInt16(short.MaxValue * Math.Sign(Math.Sin(((Math.PI * 2 * frequency) / SAMPLE_RATE) * i)));
+            }
+
+            short tmpSample = -short.MaxValue;
+            int samplesPerWaveLength = (int)(SAMPLE_RATE / frequency);
+            short ampStep = (short)((short.MaxValue * 2) / samplesPerWaveLength);
+
+            /* Triangle wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                /* Used to reset the slope */
+                if (Math.Abs(tmpSample + ampStep) > short.MaxValue)
+                {
+                    ampStep = (short)-ampStep;
+                }
+                tmpSample += ampStep;
+                wave[i] = tmpSample;
+            }
+            /* Sawtooth wave */
+            for (int i = 0; i < SAMPLE_RATE; i++)
+            {
+                for (int j = 0; j < samplesPerWaveLength && i < SAMPLE_RATE; j++)
+                {
+                    tmpSample += ampStep;
+                    wave[i++] = Convert.ToInt16(tmpSample);
+                }
+                i--;
+            }
+
+            new SoundPlayer(CreateWave(wave)).Play();
             InitializeComboBox(new ComboBox[] { cbxOscillator1, cbxOscillator2, cbxOscillator3 }, DEFAULT_COMBO_BOX);
             this.KeyPreview = true; /* Very important to prevent focus on controls */
         }
@@ -41,7 +103,7 @@ namespace Synthsharp
         /// </summary>
         /// <param name="binaryWriter"></param>
         /// <returns>The MemoryStream encoded</returns>
-        public MemoryStream createWave(short[] wave)
+        public MemoryStream CreateWave(short[] wave)
         {
             MemoryStream memoryStream = new MemoryStream();
             BinaryWriter binaryWriter = new BinaryWriter(memoryStream);
@@ -71,6 +133,22 @@ namespace Synthsharp
             return memoryStream;
         }
 
+        private void SynthView_Load(object sender, EventArgs e)
+        {
+
+            string port = null;
+            IMidiAccess access = MidiAccessManager.Default;
+            IMidiPortDetails iport = access.Inputs.FirstOrDefault(i => i.Id == port) ?? access.Inputs.Last();
+            IMidiInput input = access.OpenInputAsync(iport.Id).Result;
+
+            input.MessageReceived += MessageRecieved;
+        }
+
+        private void MessageRecieved(object obj, MidiReceivedEventArgs e)
+        {
+
+        }
+
         /// <summary>
         /// Initialize the combobox values
         /// </summary>
@@ -86,12 +164,12 @@ namespace Synthsharp
 
         private void cbxOscillator1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void SynthView_KeyDown(object sender, KeyEventArgs e)
         {
-           
+
             short[] wave = new short[SAMPLE_RATE];
             float frequency = DEFAULT_FREQUENCY;
 
@@ -133,7 +211,7 @@ namespace Synthsharp
 
             int index = cbxOscillator1.SelectedIndex;
             o.ConstructWave(index);
-            new SoundPlayer(createWave(wave)).Play();
+            //new SoundPlayer(createWave(wave)).Play();
         }
     }
 }
