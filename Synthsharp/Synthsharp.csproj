@@ -50,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Oscillator.cs" />
+    <Compile Include="ReadMidiEventView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReadMidiEventView.Designer.cs">
+      <DependentUpon>ReadMidiEventView.cs</DependentUpon>
+    </Compile>
     <Compile Include="SynthView.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -67,6 +73,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ReadMidiEventView.resx">
+      <DependentUpon>ReadMidiEventView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SynthView.resx">
       <DependentUpon>SynthView.cs</DependentUpon>
     </EmbeddedResource>
