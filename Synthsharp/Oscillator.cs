@@ -2,103 +2,51 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using NAudio;
+using NAudio.Dsp;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Synthsharp
 {
     class Oscillator
     {
-        private const int SAMPLE_RATE = 44100;
-        enum SelectedWave { Sine = 0, Square = 1, Triangle = 2, Sawtooth = 3, Noise = 4 };
+        private double _gain;
+        private int _frequency;
+        private SignalGeneratorType _waveType;
+        private WaveOut _waveOut;
 
-        short[] _wave;
-        float _frequency;
-        Random _rdm;
-        short _tmpSample;
-        int _samplesPerWaveLength;
-        short _ampStep;
-        short _amplitude;
+        public double Gain { get => _gain; set => _gain = value; }
+        public int Frequency { get => _frequency; set => _frequency = value; }
+        public SignalGeneratorType WaveType { get => _waveType; set => _waveType = value; }
+        public WaveOut WaveOut { get => _waveOut; set => _waveOut = value; }
 
-        public short[] Wave { get => _wave; set => _wave = value; }
-        public float Frequency { get => _frequency; set => _frequency = value; }
-        public Random Rdm { get => _rdm; set => _rdm = value; }
-        public short TmpSample { get => _tmpSample; set => _tmpSample = value; }
-        public int SamplesPerWaveLength { get => _samplesPerWaveLength; set => _samplesPerWaveLength = value; }
-        public short AmpStep { get => _ampStep; set => _ampStep = value; }
-        public short Amplitude { get => _amplitude; set => _amplitude = value; }
-
-        public Oscillator(short[] pWave, float pFrequency, Random pRdm, short pTmpSample, int pSamplesPerWaveLength, short pAmpStep, short pAmplitude)
+        public Oscillator(double pGain, int pFrequency, WaveOut pWaveOut)
         {
-            this._wave = pWave;
-            this._frequency = pFrequency;
-            this._rdm = pRdm;
-            this._tmpSample = pTmpSample;
-            this._samplesPerWaveLength = pSamplesPerWaveLength;
-            this._ampStep = pAmpStep;
-            this._amplitude = pAmplitude;
+            this.Gain = pGain;
+            this.Frequency = pFrequency;
+            this.WaveOut = pWaveOut;
         }
 
-        public void ConstructWave(int index) {
-            /* Algorithms are available at this address : 
-             * https://blogs.msdn.microsoft.com/dawate/2009/06/25/intro-to-audio-programming-part-4-algorithms-for-different-sound-waves-in-c/ */
-
-            /* 
-            short.MaxValue is the Amplitude 
-            ((Math.PI * 2 * frequency) / SAMPLE_RATE) is the t (angular frequency)
-            i is itself (time unit) 
-            */
-            switch (index)
+        public void CreateSineWave(double pGain, int pFrequency) {
+            var sine = new SignalGenerator()
             {
-                case (int)SelectedWave.Sine:
-                    /* Sine wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        Wave[i] = Convert.ToInt16(Amplitude * Math.Sin(((Math.PI * 2 * Frequency) / SAMPLE_RATE) * i));
-                    }
-                    break;
-                case (int)SelectedWave.Square:
-                    /* Square wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        Wave[i] = Convert.ToInt16(Amplitude * Math.Sign(Math.Sin(((Math.PI * 2 * Frequency) / SAMPLE_RATE) * i)));
-                    }
-                    break;
-                case (int)SelectedWave.Sawtooth:
-                    /* Triangle wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        /* Used to reset the slope */
-                        if (Math.Abs(TmpSample + AmpStep) > Amplitude)
-                        {
-                            AmpStep = (short)-AmpStep;
-                        }
-                        TmpSample += AmpStep;
-                        Wave[i] = TmpSample;
-                    }
-                    break;
-                case (int)SelectedWave.Triangle:
-                    /* Sawtooth wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        for (int j = 0; j < SamplesPerWaveLength && i < SAMPLE_RATE; j++)
-                        {
-                            TmpSample += AmpStep;
-                            Wave[i++] = Convert.ToInt16(TmpSample);
-                        }
-                        i--;
-                    }
-                    break;
-                case (int)SelectedWave.Noise:
-                    /* Noise wave */
-                    for (int i = 0; i < SAMPLE_RATE; i++)
-                    {
-                        Wave[i] = (short)Rdm.Next(-Amplitude, Amplitude);
-                    }
-                    break;
-                default:
-                    break;
+                Gain = pGain,
+                Frequency = pFrequency,
+                Type = SignalGeneratorType.Sin
+            }.Take(TimeSpan.FromSeconds(1));
 
-            }
+            WaveOut = new WaveOut();
+            WaveOut.Init(sine);
+            WaveOut.Play();
+
+        }
+
+        public void StopWave() {
+            WaveOut.Stop();
         }
     }
 }
