@@ -14,6 +14,7 @@ namespace Synthsharp
 {
     class Oscillator
     {
+        private const int TIME = 1;
         private double _gain;
         private int _frequency;
         private SignalGeneratorType _waveType;
@@ -24,25 +25,25 @@ namespace Synthsharp
         public SignalGeneratorType WaveType { get => _waveType; set => _waveType = value; }
         public WaveOut WaveOut { get => _waveOut; set => _waveOut = value; }
 
-        public Oscillator(double pGain, int pFrequency, WaveOut pWaveOut)
+        public Oscillator(double pGain, int pFrequency, WaveOut pWaveOut, SignalGeneratorType pType)
         {
             this.Gain = pGain;
             this.Frequency = pFrequency;
             this.WaveOut = pWaveOut;
+            this.WaveType = pType;
         }
 
-        public void CreateSineWave(double pGain, int pFrequency) {
-            var sine = new SignalGenerator()
+        public void CreateWave(double pGain, int pFrequency) {
+            var signal = new SignalGenerator()
             {
                 Gain = pGain,
                 Frequency = pFrequency,
-                Type = SignalGeneratorType.Sin
-            }.Take(TimeSpan.FromSeconds(1));
+                Type = WaveType
+            }.Take(TimeSpan.FromSeconds(TIME));
 
             WaveOut = new WaveOut();
-            WaveOut.Init(sine);
+            WaveOut.Init(signal);
             WaveOut.Play();
-
         }
 
         public void StopWave() {
