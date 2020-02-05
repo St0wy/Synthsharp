@@ -35,16 +35,21 @@ namespace Synthsharp
 
         private void btnSelectDevice_Click(object sender, EventArgs e)
         {
+
             if (cbxDevice.SelectedItem.ToString() != NO_DEVICE_DETECTED_MESSAGE)
             {
+                MIDIManagement mm = new MIDIManagement(cbxDevice.SelectedIndex);
+                mm.Load();
+                /*
                 MidiIn m = new MidiIn(cbxDevice.SelectedIndex);
                 m.MessageReceived += midiIn_MessageReceived;
                 m.ErrorReceived += midiIn_ErrorReceived;
                 m.Start();
                 btnSelectDevice.Enabled = false;
+                */
             }
         }
-
+        /*
         private void midiIn_ErrorReceived(object sender, MidiInMessageEventArgs e)
         {
             string message = "ERROR";
@@ -78,6 +83,6 @@ namespace Synthsharp
             Invoke((MethodInvoker)delegate { lbxMessage.Items.Add(message); });
             Invoke((MethodInvoker)delegate { lbxMessage.SelectedIndex = lbxMessage.Items.Count - 1; });
         }
-
+        */
     }
 }
