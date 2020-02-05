@@ -31,16 +31,16 @@ namespace Synthsharp
             this.WaveOut = pWaveOut;
         }
 
-        public void CreateSineWave(double pGain, int pFrequency) {
-            var sine = new SignalGenerator()
+        public void CreateWave(double pGain, int pFrequency, SignalGeneratorType type) {
+            var signal = new SignalGenerator()
             {
                 Gain = pGain,
                 Frequency = pFrequency,
-                Type = SignalGeneratorType.Sin
+                Type = type
             }.Take(TimeSpan.FromSeconds(1));
 
             WaveOut = new WaveOut();
-            WaveOut.Init(sine);
+            WaveOut.Init(signal);
             WaveOut.Play();
 
         }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -16,6 +18,7 @@ namespace Synthsharp
 
     public partial class SynthView : Form
     {
+        Oscillator o;
         private const int SAMPLE_RATE = 44100;
         private const short BITS_PER_SAMPLE = 16;
         private const int DEFAULT_FREQUENCY = 440;
@@ -84,8 +87,14 @@ namespace Synthsharp
                 default:
                     break;
             }
-            //  Oscillator o = new Oscillator(1, frequency, );
-            //  o.CreateSineWave(1, frequency);
+            o = new Oscillator(1, frequency, new WaveOut());
+            o.CreateWave(1, frequency, SignalGeneratorType.Triangle);
+            o.CreateWave(2, frequency, SignalGeneratorType.Sin);
+        }
+
+        private void SynthView_KeyUp(object sender, KeyEventArgs e)
+        {
+            o.StopWave();
         }
     }
 }
