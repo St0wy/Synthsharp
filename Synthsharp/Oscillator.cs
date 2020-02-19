@@ -12,9 +12,13 @@ using NAudio.Wave.SampleProviders;
 
 namespace Synthsharp
 {
-    class Oscillator
+    public class Oscillator
     {
         private const int TIME = 1;
+        private const int DEFAULT_GAIN = 1;
+        private const int DEFAULT_FREQUENCY = 440;
+        private const SignalGeneratorType DEFAULT_SIGNAL_TYPE = SignalGeneratorType.Sin;
+
         private double _gain;
         private int _frequency;
         private SignalGeneratorType _waveType;
@@ -25,15 +29,21 @@ namespace Synthsharp
         public SignalGeneratorType WaveType { get => _waveType; set => _waveType = value; }
         public WaveOut WaveOut { get => _waveOut; set => _waveOut = value; }
 
-        public Oscillator(double pGain, int pFrequency, WaveOut pWaveOut, SignalGeneratorType pType)
+        public Oscillator(double pGain, int pFrequency, SignalGeneratorType pType)
         {
             this.Gain = pGain;
             this.Frequency = pFrequency;
-            this.WaveOut = pWaveOut;
+            this.WaveOut = new WaveOut();
             this.WaveType = pType;
         }
 
-        public void CreateWave(double pGain, int pFrequency) {
+        public Oscillator() : this(DEFAULT_GAIN, DEFAULT_FREQUENCY, DEFAULT_SIGNAL_TYPE)
+        {
+
+        }
+
+        public void CreateWave(double pGain, int pFrequency)
+        {
             var signal = new SignalGenerator()
             {
                 Gain = pGain,
@@ -46,8 +56,10 @@ namespace Synthsharp
             WaveOut.Play();
         }
 
-        public void StopWave() {
+        public void StopWave()
+        {
             WaveOut.Stop();
         }
     }
 }
+

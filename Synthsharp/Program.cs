@@ -16,7 +16,7 @@ namespace Synthsharp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new TestSine());
+            Application.Run(new SynthView());
         }
     }
 }

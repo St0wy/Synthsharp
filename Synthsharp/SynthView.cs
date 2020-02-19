@@ -18,10 +18,6 @@ namespace Synthsharp
 
     public partial class SynthView : Form
     {
-        Oscillator o1;
-        Oscillator o2;
-        Oscillator o3;
-        int frequency;
         private const int SAMPLE_RATE = 44100;
         private const short BITS_PER_SAMPLE = 16;
         private const int DEFAULT_FREQUENCY = 440;
@@ -33,16 +29,58 @@ namespace Synthsharp
         private const int FREQUENCY_FOR_C7_NOTE = 2093;
         private const int FREQUENCY_FOR_C8_NOTE = 4186;
 
+        private const int OSCILLATOR_1 = 1;
+        private const int OSCILLATOR_2 = 2;
+        private const int OSCILLATOR_3 = 3;
+
+        private const char SINE_CODE = 'S';
+        private const char SQUARE_CODE = 'Q';
+        private const char SAWTOOTH_CODE = 'A';
+        private const char TRIANGLE_CODE = 'T';
+        private const char NOISE_CODE = 'N';
+
+        Oscillator o1;
+        Oscillator o2;
+        Oscillator o3;
+
+        List<Button> Oscillator1Buttons;
+        List<Button> Oscillator2Buttons;
+        List<Button> Oscillator3Buttons;
+
+        int frequency;
+
         public SynthView()
         {
             InitializeComponent();
             KeyPreview = true;
-        }
+            o1 = new Oscillator();
+            o2 = new Oscillator();
+            o3 = new Oscillator();
 
-
-        private void SynthView_Load(object sender, EventArgs e)
-        {
-           
+            Oscillator1Buttons = new List<Button>()
+            {
+                btnNoise1,
+                btnSawTooth1,
+                btnSine1,
+                btnSquare1,
+                btnTriangle1
+            };
+            Oscillator2Buttons = new List<Button>()
+            {
+                btnNoise2,
+                btnSawTooth2,
+                btnSine2,
+                btnSquare2,
+                btnTriangle2
+            };
+            Oscillator3Buttons = new List<Button>()
+            {
+                btnNoise3,
+                btnSawTooth3,
+                btnSine3,
+                btnSquare3,
+                btnTriangle3
+            };
         }
 
         /// <summary>
@@ -58,17 +96,12 @@ namespace Synthsharp
             }
         }
 
-
         private void SynthView_KeyUp(object sender, KeyEventArgs e)
         {
             o1.StopWave();
             o2.StopWave();
             o3.StopWave();
         }
-
-
-
-
 
         private void SynthView_KeyDown(object sender, KeyEventArgs e)
         {
@@ -116,121 +149,72 @@ namespace Synthsharp
             }
 
         }
-        private void btnSine1_Click(object sender, EventArgs e)
+
+        private void BtnWaveForm_Click(object sender, EventArgs e)
         {
-            if (o1 == null)
+            if (sender is Button btn)
             {
-                o1 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Sin);
-            }
-        }
-        private void btnSquare1_Click(object sender, EventArgs e)
-        {
-            if (o1 == null)
-            {
-                o1 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Square);
+                //Disable the button we clicked on
+                btn.Enabled = false;
+
+                //The tag should look like this: 1S  ->  Oscillator 1, sine waveform
+                string tag = btn.Tag.ToString();
+                //The first char of the tag is the oscillator id
+                int oscillatorId = (int)Char.GetNumericValue(tag[0]);
+                //The second char of the tag is the type of waveform
+                char waveType = tag[1];
+
+                if (oscillatorId == OSCILLATOR_1)
+                {
+                    ChangeWaveType(ref o1, waveType);
+                    ManageButtonActivation(Oscillator1Buttons, btn);
+                }
+                else if (oscillatorId == OSCILLATOR_2)
+                {
+                    ChangeWaveType(ref o2, waveType);
+                    ManageButtonActivation(Oscillator2Buttons, btn);
+                }
+                else if (oscillatorId == OSCILLATOR_3)
+                {
+                    ChangeWaveType(ref o3, waveType);
+                    ManageButtonActivation(Oscillator3Buttons, btn);
+                }
             }
         }
 
-        private void btnSawTooth1_Click(object sender, EventArgs e)
+        private void ChangeWaveType(ref Oscillator oscillator, char waveType)
         {
-            if (o1 == null)
+            //Waveform management
+            if (waveType == SINE_CODE)
             {
-                o1 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.SawTooth);
+                oscillator.WaveType = SignalGeneratorType.Sin;
+            }
+            else if (waveType == SQUARE_CODE)
+            {
+                oscillator.WaveType = SignalGeneratorType.Square;
+            }
+            else if (waveType == SAWTOOTH_CODE)
+            {
+                oscillator.WaveType = SignalGeneratorType.SawTooth;
+            }
+            else if (waveType == TRIANGLE_CODE)
+            {
+                oscillator.WaveType = SignalGeneratorType.Triangle;
+            }
+            else if (waveType == NOISE_CODE)
+            {
+                oscillator.WaveType = SignalGeneratorType.White;
             }
         }
 
-        private void btnNoise1_Click(object sender, EventArgs e)
+        private void ManageButtonActivation(List<Button> buttons, Button sender)
         {
-            if (o1 == null)
+            foreach (Button button in buttons)
             {
-                o1 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.White);
-            }
-        }
-
-        private void btnTriangle1_Click(object sender, EventArgs e)
-        {
-            if (o1 == null)
-            {
-                o1 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Triangle);
-            }
-        }
-
-        private void btnSine2_Click(object sender, EventArgs e)
-        {
-            if (o2 == null)
-            {
-                o2 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Square);
-            }
-        }
-
-        private void btnSawTooth2_Click(object sender, EventArgs e)
-        {
-            if (o2 == null)
-            {
-                o2 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.SawTooth);
-            }
-        }
-
-        private void btnTriangle2_Click(object sender, EventArgs e)
-        {
-            if (o2 == null)
-            {
-                o2 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Triangle);
-            }
-        }
-
-        private void btnNoise2_Click(object sender, EventArgs e)
-        {
-            if (o2 == null)
-            {
-                o2 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.White);
-            }
-        }
-        private void btnSquare2_Click(object sender, EventArgs e)
-        {
-            if (o2 == null)
-            {
-                o2 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Square);
-            }
-        }
-
-        private void btnSine3_Click(object sender, EventArgs e)
-        {
-            if (o3 == null)
-            {
-                o3 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Sin);
-            }
-        }
-
-        private void btnSquare3_Click(object sender, EventArgs e)
-        {
-            if (o3 == null)
-            {
-                o3 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Square);
-            }
-        }
-
-        private void btnSawTooth3_Click(object sender, EventArgs e)
-        {
-            if (o3 == null)
-            {
-                o3 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.SawTooth);
-            }
-        }
-
-        private void btnNoise_Click(object sender, EventArgs e)
-        {
-            if (o3 == null)
-            {
-                o3 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.White);
-            }
-        }
-
-        private void btnTriangle3_Click(object sender, EventArgs e)
-        {
-            if (o3 == null)
-            {
-                o3 = new Oscillator(1, frequency, new WaveOut(), SignalGeneratorType.Triangle);
+                if(button != sender)
+                {
+                    button.Enabled = true;
+                }
             }
         }
     }
