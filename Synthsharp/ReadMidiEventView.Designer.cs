@@ -59,7 +59,7 @@
             this.btnSelectDevice.TabIndex = 3;
             this.btnSelectDevice.Text = "Selectionner";
             this.btnSelectDevice.UseVisualStyleBackColor = true;
-            this.btnSelectDevice.Click += new System.EventHandler(this.btnSelectDevice_Click);
+            this.btnSelectDevice.Click += new System.EventHandler(this.BtnSelectDevice_Click);
             // 
             // lbxMessage
             // 

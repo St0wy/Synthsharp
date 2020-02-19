@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using NAudio.Midi;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
@@ -36,19 +37,22 @@ namespace Synthsharp
         private const char SINE_CODE = 'S';
         private const char SQUARE_CODE = 'Q';
         private const char SAWTOOTH_CODE = 'A';
-        private const char TRIANGLE_CODE = 'T';
         private const char NOISE_CODE = 'N';
+        private const char TRIANGLE_CODE = 'T';
+
+        private const string NO_DEVICE_DETECTED_MESSAGE = "Aucun dispositif trouvé";
+
+        private const int DEFAULT_MIDI_DEVICE_ID = 0;
 
         Oscillator o1;
         Oscillator o2;
         Oscillator o3;
 
-        List<Button> Oscillator1Buttons;
-        List<Button> Oscillator2Buttons;
-        List<Button> Oscillator3Buttons;
+        readonly List<Button> Oscillator1Buttons;
+        readonly List<Button> Oscillator2Buttons;
+        readonly List<Button> Oscillator3Buttons;
 
-        int frequency;
-
+        MIDIPlayer midiPlayer;
         public SynthView()
         {
             InitializeComponent();
@@ -81,6 +85,12 @@ namespace Synthsharp
                 btnSquare3,
                 btnTriangle3
             };
+
+            //If there is a midi device, we create a new midi player
+            if (MidiIn.NumberOfDevices > 0)
+            {
+                midiPlayer = new MIDIPlayer(DEFAULT_MIDI_DEVICE_ID, o1, o2, o3);
+            }
         }
 
         /// <summary>
@@ -103,52 +113,7 @@ namespace Synthsharp
             o3.StopWave();
         }
 
-        private void SynthView_KeyDown(object sender, KeyEventArgs e)
-        {
-            frequency = DEFAULT_FREQUENCY;
 
-            /* Frenquencies available at this address : https://en.wikipedia.org/wiki/Piano_key_frequencies (using C2 to C8)*/
-            switch (e.KeyCode)
-            {
-                case Keys.Y:
-                    frequency = FREQUENCY_FOR_C2_NOTE;
-                    break;
-                case Keys.X:
-                    frequency = FREQUENCY_FOR_C3_NOTE;
-                    break;
-                case Keys.C:
-                    frequency = FREQUENCY_FOR_C4_NOTE;
-                    break;
-                case Keys.V:
-                    frequency = FREQUENCY_FOR_C5_NOTE;
-                    break;
-                case Keys.B:
-                    frequency = FREQUENCY_FOR_C6_NOTE;
-                    break;
-                case Keys.H:
-                    frequency = FREQUENCY_FOR_C7_NOTE;
-                    break;
-                case Keys.M:
-                    frequency = FREQUENCY_FOR_C8_NOTE;
-                    break;
-                default:
-                    break;
-            }
-
-            if (o1 != null)
-            {
-                o1.CreateWave(1, frequency);
-            }
-            if (o2 != null)
-            {
-                o2.CreateWave(1, frequency);
-            }
-            if (o3 != null)
-            {
-                o3.CreateWave(1, frequency);
-            }
-
-        }
 
         private void BtnWaveForm_Click(object sender, EventArgs e)
         {
@@ -211,9 +176,49 @@ namespace Synthsharp
         {
             foreach (Button button in buttons)
             {
-                if(button != sender)
+                if (button != sender)
                 {
                     button.Enabled = true;
+                }
+            }
+        }
+
+        private void ChkOnOscillator1_CheckedChanged(object sender, EventArgs e)
+        {
+            o1.IsEnabled = chkOnOscillator1.Checked;
+        }
+
+        private void chkOnOscillator2_CheckedChanged(object sender, EventArgs e)
+        {
+            o2.IsEnabled = chkOnOscillator2.Checked;
+        }
+
+        private void chkOnOscillator3_CheckedChanged(object sender, EventArgs e)
+        {
+            o3.IsEnabled = chkOnOscillator3.Checked;
+        }
+
+        private void SynthView_Load(object sender, EventArgs e)
+        {
+            for (int device = 0; device < MidiIn.NumberOfDevices; device++)
+            {
+                cbxDevice.Items.Add(MidiIn.DeviceInfo(device).ProductName);
+            }
+            if (cbxDevice.Items.Count == 0)
+            {
+                cbxDevice.Items.Add(NO_DEVICE_DETECTED_MESSAGE);
+            }
+            cbxDevice.SelectedIndex = 0;
+        }
+
+        private void cbxDevice_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //If there is a midi device, we create a new midi player
+            if (MidiIn.NumberOfDevices > 0)
+            {
+                if (cbxDevice.SelectedItem.ToString() != NO_DEVICE_DETECTED_MESSAGE)
+                {
+                    midiPlayer = new MIDIPlayer(cbxDevice.SelectedIndex, o1, o2, o3);
                 }
             }
         }

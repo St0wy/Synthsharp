@@ -42,6 +42,7 @@
             this.chkVcaOscillator1 = new System.Windows.Forms.CheckBox();
             this.chkVcoOscillator1 = new System.Windows.Forms.CheckBox();
             this.groupbox2 = new System.Windows.Forms.GroupBox();
+            this.trbOscillator2 = new System.Windows.Forms.TrackBar();
             this.btnNoise2 = new System.Windows.Forms.Button();
             this.btnTriangle2 = new System.Windows.Forms.Button();
             this.btnSawTooth2 = new System.Windows.Forms.Button();
@@ -54,6 +55,7 @@
             this.chkVcaOscillator2 = new System.Windows.Forms.CheckBox();
             this.chkVcoOscillator2 = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.trbOscillator3 = new System.Windows.Forms.TrackBar();
             this.btnNoise3 = new System.Windows.Forms.Button();
             this.chkOnOscillator3 = new System.Windows.Forms.CheckBox();
             this.btnTriangle3 = new System.Windows.Forms.Button();
@@ -65,13 +67,12 @@
             this.btnSine3 = new System.Windows.Forms.Button();
             this.chkVcaOscillator3 = new System.Windows.Forms.CheckBox();
             this.chkVcoOscillator3 = new System.Windows.Forms.CheckBox();
-            this.trbOscillator2 = new System.Windows.Forms.TrackBar();
-            this.trbOscillator3 = new System.Windows.Forms.TrackBar();
+            this.cbxDevice = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbOscillator1)).BeginInit();
             this.groupbox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbOscillator2)).BeginInit();
+            this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbOscillator3)).BeginInit();
             this.SuspendLayout();
             // 
@@ -165,12 +166,15 @@
             // chkOnOscillator1
             // 
             this.chkOnOscillator1.AutoSize = true;
+            this.chkOnOscillator1.Checked = true;
+            this.chkOnOscillator1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkOnOscillator1.Location = new System.Drawing.Point(386, 19);
             this.chkOnOscillator1.Name = "chkOnOscillator1";
             this.chkOnOscillator1.Size = new System.Drawing.Size(40, 17);
             this.chkOnOscillator1.TabIndex = 8;
             this.chkOnOscillator1.Text = "On";
             this.chkOnOscillator1.UseVisualStyleBackColor = true;
+            this.chkOnOscillator1.CheckedChanged += new System.EventHandler(this.ChkOnOscillator1_CheckedChanged);
             // 
             // chkEnveloppeOscillator1
             // 
@@ -243,6 +247,17 @@
             this.groupbox2.TabStop = false;
             this.groupbox2.Text = "Oscillator 2";
             // 
+            // trbOscillator2
+            // 
+            this.trbOscillator2.Cursor = System.Windows.Forms.Cursors.Default;
+            this.trbOscillator2.Location = new System.Drawing.Point(208, 89);
+            this.trbOscillator2.Maximum = 32767;
+            this.trbOscillator2.Name = "trbOscillator2";
+            this.trbOscillator2.Size = new System.Drawing.Size(234, 45);
+            this.trbOscillator2.SmallChange = 1000;
+            this.trbOscillator2.TabIndex = 24;
+            this.trbOscillator2.Value = 32767;
+            // 
             // btnNoise2
             // 
             this.btnNoise2.Location = new System.Drawing.Point(81, 49);
@@ -301,12 +316,15 @@
             // chkOnOscillator2
             // 
             this.chkOnOscillator2.AutoSize = true;
+            this.chkOnOscillator2.Checked = true;
+            this.chkOnOscillator2.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkOnOscillator2.Location = new System.Drawing.Point(386, 19);
             this.chkOnOscillator2.Name = "chkOnOscillator2";
             this.chkOnOscillator2.Size = new System.Drawing.Size(40, 17);
             this.chkOnOscillator2.TabIndex = 20;
             this.chkOnOscillator2.Text = "On";
             this.chkOnOscillator2.UseVisualStyleBackColor = true;
+            this.chkOnOscillator2.CheckedChanged += new System.EventHandler(this.chkOnOscillator2_CheckedChanged);
             // 
             // chkEnveloppeOscillator2
             // 
@@ -379,6 +397,18 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Oscillator 3";
             // 
+            // trbOscillator3
+            // 
+            this.trbOscillator3.Cursor = System.Windows.Forms.Cursors.Default;
+            this.trbOscillator3.Location = new System.Drawing.Point(208, 96);
+            this.trbOscillator3.Maximum = 32767;
+            this.trbOscillator3.Name = "trbOscillator3";
+            this.trbOscillator3.Size = new System.Drawing.Size(234, 45);
+            this.trbOscillator3.SmallChange = 1000;
+            this.trbOscillator3.TabIndex = 36;
+            this.trbOscillator3.Tag = "";
+            this.trbOscillator3.Value = 32767;
+            // 
             // btnNoise3
             // 
             this.btnNoise3.Location = new System.Drawing.Point(81, 49);
@@ -393,12 +423,15 @@
             // chkOnOscillator3
             // 
             this.chkOnOscillator3.AutoSize = true;
+            this.chkOnOscillator3.Checked = true;
+            this.chkOnOscillator3.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkOnOscillator3.Location = new System.Drawing.Point(386, 19);
             this.chkOnOscillator3.Name = "chkOnOscillator3";
             this.chkOnOscillator3.Size = new System.Drawing.Size(40, 17);
             this.chkOnOscillator3.TabIndex = 32;
             this.chkOnOscillator3.Text = "On";
             this.chkOnOscillator3.UseVisualStyleBackColor = true;
+            this.chkOnOscillator3.CheckedChanged += new System.EventHandler(this.chkOnOscillator3_CheckedChanged);
             // 
             // btnTriangle3
             // 
@@ -494,34 +527,21 @@
             this.chkVcoOscillator3.Text = "VCO";
             this.chkVcoOscillator3.UseVisualStyleBackColor = true;
             // 
-            // trbOscillator2
+            // cbxDevice
             // 
-            this.trbOscillator2.Cursor = System.Windows.Forms.Cursors.Default;
-            this.trbOscillator2.Location = new System.Drawing.Point(208, 89);
-            this.trbOscillator2.Maximum = 32767;
-            this.trbOscillator2.Name = "trbOscillator2";
-            this.trbOscillator2.Size = new System.Drawing.Size(234, 45);
-            this.trbOscillator2.SmallChange = 1000;
-            this.trbOscillator2.TabIndex = 24;
-            this.trbOscillator2.Value = 32767;
-            // 
-            // trbOscillator3
-            // 
-            this.trbOscillator3.Cursor = System.Windows.Forms.Cursors.Default;
-            this.trbOscillator3.Location = new System.Drawing.Point(208, 96);
-            this.trbOscillator3.Maximum = 32767;
-            this.trbOscillator3.Name = "trbOscillator3";
-            this.trbOscillator3.Size = new System.Drawing.Size(234, 45);
-            this.trbOscillator3.SmallChange = 1000;
-            this.trbOscillator3.TabIndex = 36;
-            this.trbOscillator3.Tag = "";
-            this.trbOscillator3.Value = 32767;
+            this.cbxDevice.FormattingEnabled = true;
+            this.cbxDevice.Location = new System.Drawing.Point(31, 480);
+            this.cbxDevice.Name = "cbxDevice";
+            this.cbxDevice.Size = new System.Drawing.Size(170, 21);
+            this.cbxDevice.TabIndex = 4;
+            this.cbxDevice.SelectedIndexChanged += new System.EventHandler(this.cbxDevice_SelectedIndexChanged);
             // 
             // SynthView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(520, 513);
+            this.Controls.Add(this.cbxDevice);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupbox2);
             this.Controls.Add(this.groupBox1);
@@ -529,16 +549,16 @@
             this.MaximizeBox = false;
             this.Name = "SynthView";
             this.Text = "Synthsharp";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SynthView_KeyDown);
+            this.Load += new System.EventHandler(this.SynthView_Load);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.SynthView_KeyUp);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbOscillator1)).EndInit();
             this.groupbox2.ResumeLayout(false);
             this.groupbox2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trbOscillator2)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trbOscillator2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trbOscillator3)).EndInit();
             this.ResumeLayout(false);
 
@@ -585,6 +605,7 @@
         private System.Windows.Forms.Button btnSine3;
         private System.Windows.Forms.TrackBar trbOscillator2;
         private System.Windows.Forms.TrackBar trbOscillator3;
+        private System.Windows.Forms.ComboBox cbxDevice;
     }
 }
 

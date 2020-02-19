@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MIDIManagement.cs" />
+    <Compile Include="MIDIPlayer.cs" />
     <Compile Include="Oscillator.cs" />
     <Compile Include="ReadMidiEventView.cs">
       <SubType>Form</SubType>
