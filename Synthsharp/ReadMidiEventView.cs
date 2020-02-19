@@ -35,43 +35,54 @@ namespace Synthsharp
 
         private void btnSelectDevice_Click(object sender, EventArgs e)
         {
+
             if (cbxDevice.SelectedItem.ToString() != NO_DEVICE_DETECTED_MESSAGE)
             {
+                MIDIManagement mm = new MIDIManagement(cbxDevice.SelectedIndex);
+                mm.Load();
+                /*
                 MidiIn m = new MidiIn(cbxDevice.SelectedIndex);
                 m.MessageReceived += midiIn_MessageReceived;
-                //m.ErrorReceived += midiIn_ErrorReceived;
+                m.ErrorReceived += midiIn_ErrorReceived;
                 m.Start();
                 btnSelectDevice.Enabled = false;
+                */
             }
         }
-
+        /*
         private void midiIn_ErrorReceived(object sender, MidiInMessageEventArgs e)
         {
-            string myString = string.Format(" Time {0} Message 0x {1: X8} Event {2} ",
-              e.Timestamp, e.RawMessage, e.MidiEvent);
-            Invoke((MethodInvoker)delegate { lbxMessage.Items.Add(myString); });
+            string message = "ERROR";
+            Invoke((MethodInvoker)delegate { lbxMessage.Items.Add(message); });
             Invoke((MethodInvoker)delegate { lbxMessage.SelectedIndex = lbxMessage.Items.Count - 1; });
 
         }
 
         private void midiIn_MessageReceived(object sender, MidiInMessageEventArgs e)
         {
-            //MemoryStream memoryStream = new MemoryStream();
-            //BinaryWriter br = new BinaryWriter(memoryStream);
-            //e.MidiEvent.Export(e.MidiEvent.AbsoluteTime, br);
-            //NoteEvent ne = new NoteEvent(br);
-            //string myString = string.Format(" Time {0} Message 0x {1: X8} Event {2} ",
-            //e.Timestamp, e.RawMessage, ne.NoteName);
-            //Invoke((MethodInvoker)delegate { lbxMessage.Items.Add(myString); });
+            string message = string.Empty;
+            if (e.MidiEvent is NoteEvent)
+            {
 
-             string myString = string.Format(" Time {0} Note {1: X8} N° touche {2} ",
-              e.Timestamp, (e.MidiEvent as NoteEvent).NoteName, (e.MidiEvent as NoteEvent).NoteNumber);
-            if ((e.MidiEvent as NoteEvent).NoteName.Substring(0,1) == "C"){
-                myString = "YEY";
+                message = string.Format(" Time : {0} NoteName : {1} N° Key {2} ",
+                e.Timestamp, (e.MidiEvent as NoteEvent).NoteName, (e.MidiEvent as NoteEvent).NoteNumber);
+                
+                if ((e.MidiEvent is NoteEvent) && (e.MidiEvent as NoteEvent).NoteName.Substring(0, 1) == "C")
+                {
+                    message = "Note C";
+                }
+
+                
             }
-            Invoke((MethodInvoker)delegate { lbxMessage.Items.Add(myString); });
+            else if(e.MidiEvent is ControlChangeEvent)
+            {
+                message = string.Format(" Time : {0} ControllerNumber : {1} ControllerValue {2} ",
+                e.Timestamp, (e.MidiEvent as ControlChangeEvent).Controller, (e.MidiEvent as ControlChangeEvent).ControllerValue);
+
+            }
+            Invoke((MethodInvoker)delegate { lbxMessage.Items.Add(message); });
             Invoke((MethodInvoker)delegate { lbxMessage.SelectedIndex = lbxMessage.Items.Count - 1; });
         }
-
+        */
     }
 }
