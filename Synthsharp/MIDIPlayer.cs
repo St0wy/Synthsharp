@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,22 +10,19 @@ namespace Synthsharp
 {
     class MIDIPlayer : IDisposable
     {
-        private const string NOTE_C = "C";
         private const string MIDI_IN_MESSAGE_ERROR = "ERROR";
-        private const int A_FREQUENCY = 440;  //the A (la) note is 440hz
+        private const double A_FREQUENCY = 440.0;  //the A (la) note is 440hz
         private const int MIDI_NOTES_SIZE = 127;
 
-        private Oscillator _o1;
-        private Oscillator _o2;
-        private Oscillator _o3;
+        private bool disposed;
         private int _deviceIndex;
         private MidiIn _device;
         private string _inputDetails;
-        private float[] _midiNotes;
+        private readonly double[] _midiNotes;
 
-        public Oscillator O1 { get => _o1; private set => _o1 = value; }
-        public Oscillator O2 { get => _o2; private set => _o2 = value; }
-        public Oscillator O3 { get => _o3; private set => _o3 = value; }
+        public Oscillator O1 { get; private set; }
+        public Oscillator O2 { get; private set; }
+        public Oscillator O3 { get; private set; }
         public int DeviceIndex { get => _deviceIndex; private set => _deviceIndex = value; }
         public MidiIn Device { get => _device; private set => _device = value; }
         public string InputDetails { get => _inputDetails; set => _inputDetails = value; }
@@ -33,15 +31,21 @@ namespace Synthsharp
         {
             DeviceIndex = pDeviceIndex;
             Device = new MidiIn(DeviceIndex);
-            Device.MessageReceived += MidiIn_MessageReceived;
-            Device.ErrorReceived += MidiIn_ErrorReceived;
-            Device.Start();
-
+            
             O1 = o1;
             O2 = o2;
             O3 = o3;
 
             _midiNotes = ComputeMidiNotes();
+
+            disposed = false;
+        }
+
+        public void Start()
+        {
+            Device.MessageReceived += MidiIn_MessageReceived;
+            Device.ErrorReceived += MidiIn_ErrorReceived;
+            Device.Start();
         }
 
         private void MidiIn_ErrorReceived(object sender, MidiInMessageEventArgs e)
@@ -55,31 +59,39 @@ namespace Synthsharp
             {
                 InputDetails = string.Format(" Time : {0} NoteName : {1} N° Key {2} ",
                 e.Timestamp, ne.NoteName, ne.NoteNumber);
+                int frequency = (int)_midiNotes[ne.NoteNumber];
+                Debug.Print($"Frequency: {frequency}, NoteNumber: {ne.NoteNumber}");
 
-                O1.Frequency = (int)_midiNotes[ne.NoteNumber];
-                O1.CreateWave();
+                O1.Frequency = frequency;
+                O1.Play();
 
                 O2.Frequency = (int)_midiNotes[ne.NoteNumber];
-                O2.CreateWave();
+                O2.Play();
 
                 O3.Frequency = (int)_midiNotes[ne.NoteNumber];
-                O3.CreateWave();
+                O3.Play();
             }
-            else if (e.MidiEvent is ControlChangeEvent)
+            else if (e.MidiEvent is ControlChangeEvent cce)
             {
-                ControlChangeEvent cce = (e.MidiEvent as ControlChangeEvent);
                 InputDetails = string.Format(" Time : {0} ControllerNumber : {1} ControllerValue {2} ",
                 e.Timestamp, cce.Controller, cce.ControllerValue);
 
             }
         }
 
-        private float[] ComputeMidiNotes()
+        /// <summary>
+        /// Computes the frequency for the note number.
+        /// Pass the note number as the index of the array.
+        /// 
+        /// This piece of code is from: http://subsynth.sourceforge.net/midinote2freq.html
+        /// </summary>
+        /// <returns></returns>
+        private double[] ComputeMidiNotes()
         {
-            float[] midiNotes = new float[MIDI_NOTES_SIZE];
+            double[] midiNotes = new double[MIDI_NOTES_SIZE];
             for (int i = 0; i < MIDI_NOTES_SIZE; i++)
             {
-                midiNotes[i] = (A_FREQUENCY / 32) * (2 ^ ((i - 9) / 12));
+                midiNotes[i] = (A_FREQUENCY / 32.0) * Math.Pow(2.0, ((i - 9.0) / 12.0));
             }
 
             return midiNotes;
@@ -87,8 +99,24 @@ namespace Synthsharp
 
         public void Dispose()
         {
-            Device.Stop();
-            Device.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                //Dispose native and managed objects
+                Device.Stop();
+                Device.Dispose();
+            }
+            //Dispose unmanaged objects
+
+            disposed = true;
         }
     }
 }

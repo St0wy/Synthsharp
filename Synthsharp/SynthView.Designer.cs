@@ -172,6 +172,7 @@
             this.chkOnOscillator1.Name = "chkOnOscillator1";
             this.chkOnOscillator1.Size = new System.Drawing.Size(40, 17);
             this.chkOnOscillator1.TabIndex = 8;
+            this.chkOnOscillator1.Tag = "1";
             this.chkOnOscillator1.Text = "On";
             this.chkOnOscillator1.UseVisualStyleBackColor = true;
             this.chkOnOscillator1.CheckedChanged += new System.EventHandler(this.ChkOnOscillator1_CheckedChanged);
@@ -322,9 +323,10 @@
             this.chkOnOscillator2.Name = "chkOnOscillator2";
             this.chkOnOscillator2.Size = new System.Drawing.Size(40, 17);
             this.chkOnOscillator2.TabIndex = 20;
+            this.chkOnOscillator2.Tag = "2";
             this.chkOnOscillator2.Text = "On";
             this.chkOnOscillator2.UseVisualStyleBackColor = true;
-            this.chkOnOscillator2.CheckedChanged += new System.EventHandler(this.chkOnOscillator2_CheckedChanged);
+            this.chkOnOscillator2.CheckedChanged += new System.EventHandler(this.ChkOnOscillator2_CheckedChanged);
             // 
             // chkEnveloppeOscillator2
             // 
@@ -429,9 +431,10 @@
             this.chkOnOscillator3.Name = "chkOnOscillator3";
             this.chkOnOscillator3.Size = new System.Drawing.Size(40, 17);
             this.chkOnOscillator3.TabIndex = 32;
+            this.chkOnOscillator3.Tag = "3";
             this.chkOnOscillator3.Text = "On";
             this.chkOnOscillator3.UseVisualStyleBackColor = true;
-            this.chkOnOscillator3.CheckedChanged += new System.EventHandler(this.chkOnOscillator3_CheckedChanged);
+            this.chkOnOscillator3.CheckedChanged += new System.EventHandler(this.ChkOnOscillator3_CheckedChanged);
             // 
             // btnTriangle3
             // 
@@ -534,7 +537,7 @@
             this.cbxDevice.Name = "cbxDevice";
             this.cbxDevice.Size = new System.Drawing.Size(170, 21);
             this.cbxDevice.TabIndex = 4;
-            this.cbxDevice.SelectedIndexChanged += new System.EventHandler(this.cbxDevice_SelectedIndexChanged);
+            this.cbxDevice.SelectedIndexChanged += new System.EventHandler(this.CbxDevice_SelectedIndexChanged);
             // 
             // SynthView
             // 

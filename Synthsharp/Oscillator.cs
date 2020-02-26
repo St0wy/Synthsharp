@@ -17,7 +17,7 @@ namespace Synthsharp
         private const int TIME = 1;
         private const int DEFAULT_GAIN = 1;
         private const int DEFAULT_FREQUENCY = 440;
-        private const SignalGeneratorType DEFAULT_SIGNAL_TYPE = SignalGeneratorType.Sin;
+        private const SignalGeneratorType DEFAULT_WAVE_TYPE = SignalGeneratorType.Sin;
         private const bool DEFAULT_ENBALED = true;
 
         private double _gain;
@@ -41,12 +41,12 @@ namespace Synthsharp
             IsEnabled = isEnabled;
         }
 
-        public Oscillator() : this(DEFAULT_GAIN, DEFAULT_FREQUENCY, DEFAULT_SIGNAL_TYPE, DEFAULT_ENBALED)
+        public Oscillator() : this(DEFAULT_GAIN, DEFAULT_FREQUENCY, DEFAULT_WAVE_TYPE, DEFAULT_ENBALED)
         {
             
         }
 
-        public void CreateWave()
+        public void Play()
         {
             if (IsEnabled)
             {
@@ -55,7 +55,7 @@ namespace Synthsharp
                     Gain = Gain,
                     Frequency = Frequency,
                     Type = WaveType
-                }.Take(TimeSpan.FromSeconds(TIME));
+                };
 
                 WaveOut = new WaveOut();
                 WaveOut.Init(signal);
@@ -63,9 +63,10 @@ namespace Synthsharp
             }
         }
 
-        public void StopWave()
+        public void Stop()
         {
-            WaveOut.Stop();
+            if(IsEnabled)
+                WaveOut.Stop();
         }
     }
 }

@@ -19,17 +19,6 @@ namespace Synthsharp
 
     public partial class SynthView : Form
     {
-        private const int SAMPLE_RATE = 44100;
-        private const short BITS_PER_SAMPLE = 16;
-        private const int DEFAULT_FREQUENCY = 440;
-        private const int FREQUENCY_FOR_C2_NOTE = 65;
-        private const int FREQUENCY_FOR_C3_NOTE = 131;
-        private const int FREQUENCY_FOR_C4_NOTE = 262;
-        private const int FREQUENCY_FOR_C5_NOTE = 523;
-        private const int FREQUENCY_FOR_C6_NOTE = 1047;
-        private const int FREQUENCY_FOR_C7_NOTE = 2093;
-        private const int FREQUENCY_FOR_C8_NOTE = 4186;
-
         private const int OSCILLATOR_1 = 1;
         private const int OSCILLATOR_2 = 2;
         private const int OSCILLATOR_3 = 3;
@@ -37,7 +26,7 @@ namespace Synthsharp
         private const char SINE_CODE = 'S';
         private const char SQUARE_CODE = 'Q';
         private const char SAWTOOTH_CODE = 'A';
-        private const char NOISE_CODE = 'N';
+        private const char WHITE_CODE = 'N';
         private const char TRIANGLE_CODE = 'T';
 
         private const string NO_DEVICE_DETECTED_MESSAGE = "Aucun dispositif trouvé";
@@ -93,12 +82,17 @@ namespace Synthsharp
             }
         }
 
+        private void UpdateView()
+        {
+
+        }
+
         /// <summary>
         /// Initialize the combobox values
         /// </summary>
         /// <param name="cbs">Array of ComboBox</param>
         /// <param name="dataCbx">Elements of the ComboBox</param>
-        public void InitializeComboBox(ComboBox[] cbs, string[] dataCbx)
+        public static void InitializeComboBox(ComboBox[] cbs, string[] dataCbx)
         {
             foreach (ComboBox combobox in cbs)
             {
@@ -108,12 +102,10 @@ namespace Synthsharp
 
         private void SynthView_KeyUp(object sender, KeyEventArgs e)
         {
-            o1.StopWave();
-            o2.StopWave();
-            o3.StopWave();
+            o1.Stop();
+            o2.Stop();
+            o3.Stop();
         }
-
-
 
         private void BtnWaveForm_Click(object sender, EventArgs e)
         {
@@ -127,60 +119,84 @@ namespace Synthsharp
                 //The first char of the tag is the oscillator id
                 int oscillatorId = (int)Char.GetNumericValue(tag[0]);
                 //The second char of the tag is the type of waveform
-                char waveType = tag[1];
+                SignalGeneratorType signalGeneratorType = GetSignalGeneratorType(tag[1]);
 
                 if (oscillatorId == OSCILLATOR_1)
                 {
-                    ChangeWaveType(ref o1, waveType);
-                    ManageButtonActivation(Oscillator1Buttons, btn);
+                    ChangeWaveType(ref o1, Oscillator1Buttons, signalGeneratorType);
                 }
                 else if (oscillatorId == OSCILLATOR_2)
                 {
-                    ChangeWaveType(ref o2, waveType);
-                    ManageButtonActivation(Oscillator2Buttons, btn);
+                    ChangeWaveType(ref o2, Oscillator2Buttons, signalGeneratorType);
                 }
                 else if (oscillatorId == OSCILLATOR_3)
                 {
-                    ChangeWaveType(ref o3, waveType);
-                    ManageButtonActivation(Oscillator3Buttons, btn);
+                    ChangeWaveType(ref o3, Oscillator3Buttons, signalGeneratorType);
                 }
             }
         }
 
-        private void ChangeWaveType(ref Oscillator oscillator, char waveType)
+        private void ChangeWaveType(ref Oscillator oscillator, List<Button> buttons, SignalGeneratorType signalGeneratorType)
         {
-            //Waveform management
-            if (waveType == SINE_CODE)
-            {
-                oscillator.WaveType = SignalGeneratorType.Sin;
-            }
-            else if (waveType == SQUARE_CODE)
-            {
-                oscillator.WaveType = SignalGeneratorType.Square;
-            }
-            else if (waveType == SAWTOOTH_CODE)
-            {
-                oscillator.WaveType = SignalGeneratorType.SawTooth;
-            }
-            else if (waveType == TRIANGLE_CODE)
-            {
-                oscillator.WaveType = SignalGeneratorType.Triangle;
-            }
-            else if (waveType == NOISE_CODE)
-            {
-                oscillator.WaveType = SignalGeneratorType.White;
-            }
+            oscillator.WaveType = signalGeneratorType;
+            ManageButtonActivation(buttons, oscillator);
         }
 
-        private void ManageButtonActivation(List<Button> buttons, Button sender)
+        private SignalGeneratorType GetSignalGeneratorType(char waveCode)
+        {
+            SignalGeneratorType signalGeneratorType = SignalGeneratorType.Sin;
+            if (waveCode == SQUARE_CODE)
+            {
+                signalGeneratorType = SignalGeneratorType.Square;
+            }
+            else if (waveCode == SAWTOOTH_CODE)
+            {
+                signalGeneratorType = SignalGeneratorType.SawTooth;
+            }
+            else if (waveCode == TRIANGLE_CODE)
+            {
+                signalGeneratorType = SignalGeneratorType.Triangle;
+            }
+            else if (waveCode == WHITE_CODE)
+            {
+                signalGeneratorType = SignalGeneratorType.White;
+            }
+
+            return signalGeneratorType;
+        }
+
+        private void ManageButtonActivation(List<Button> buttons, Oscillator oscillator)
         {
             foreach (Button button in buttons)
             {
-                if (button != sender)
-                {
-                    button.Enabled = true;
-                }
+                //The tag should look like this: 1S  ->  Oscillator 1, sine waveform
+                string tag = button.Tag.ToString();
+                //The second char of the tag is the type of waveform
+                SignalGeneratorType signalGeneratorType = GetSignalGeneratorType(tag[1]);
+
+                button.Enabled = signalGeneratorType != oscillator.WaveType;
             }
+        }
+
+        private void ChkOnOscillator_CheckedChanged(object sender, EventArgs e)
+        {
+
+            CheckBox checkBox = sender as CheckBox;
+            int tag = int.Parse(checkBox.Tag.ToString());
+            if(tag == OSCILLATOR_1)
+            {
+                
+            }
+            else if (tag == OSCILLATOR_2)
+            {
+
+            }
+            else if (tag == OSCILLATOR_3)
+            {
+
+            }
+
+            o1.IsEnabled = chkOnOscillator1.Checked;
         }
 
         private void ChkOnOscillator1_CheckedChanged(object sender, EventArgs e)
@@ -188,12 +204,12 @@ namespace Synthsharp
             o1.IsEnabled = chkOnOscillator1.Checked;
         }
 
-        private void chkOnOscillator2_CheckedChanged(object sender, EventArgs e)
+        private void ChkOnOscillator2_CheckedChanged(object sender, EventArgs e)
         {
             o2.IsEnabled = chkOnOscillator2.Checked;
         }
 
-        private void chkOnOscillator3_CheckedChanged(object sender, EventArgs e)
+        private void ChkOnOscillator3_CheckedChanged(object sender, EventArgs e)
         {
             o3.IsEnabled = chkOnOscillator3.Checked;
         }
@@ -209,15 +225,30 @@ namespace Synthsharp
                 cbxDevice.Items.Add(NO_DEVICE_DETECTED_MESSAGE);
             }
             cbxDevice.SelectedIndex = 0;
+
+
+            if (midiPlayer != null)
+            {
+                midiPlayer.Start();
+            }
+
+            ManageButtonActivation(Oscillator1Buttons, o1);
+            ManageButtonActivation(Oscillator2Buttons, o2);
+            ManageButtonActivation(Oscillator3Buttons, o3);
         }
 
-        private void cbxDevice_SelectedIndexChanged(object sender, EventArgs e)
+        private void CbxDevice_SelectedIndexChanged(object sender, EventArgs e)
         {
             //If there is a midi device, we create a new midi player
             if (MidiIn.NumberOfDevices > 0)
             {
                 if (cbxDevice.SelectedItem.ToString() != NO_DEVICE_DETECTED_MESSAGE)
                 {
+                    //The midi player must be diposed before being reconstructed to release the midi device
+                    if (midiPlayer != null)
+                    {
+                        midiPlayer.Dispose();
+                    }
                     midiPlayer = new MIDIPlayer(cbxDevice.SelectedIndex, o1, o2, o3);
                 }
             }
