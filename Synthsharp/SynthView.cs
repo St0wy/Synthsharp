@@ -100,13 +100,6 @@ namespace Synthsharp
             }
         }
 
-        private void SynthView_KeyUp(object sender, KeyEventArgs e)
-        {
-            o1.Stop();
-            o2.Stop();
-            o3.Stop();
-        }
-
         private void BtnWaveForm_Click(object sender, EventArgs e)
         {
             if (sender is Button btn)
@@ -185,7 +178,7 @@ namespace Synthsharp
             int tag = int.Parse(checkBox.Tag.ToString());
             if(tag == OSCILLATOR_1)
             {
-                
+                //TODO Handle view desactivation
             }
             else if (tag == OSCILLATOR_2)
             {

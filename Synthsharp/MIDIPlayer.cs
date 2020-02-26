@@ -12,20 +12,18 @@ namespace Synthsharp
     {
         private const string MIDI_IN_MESSAGE_ERROR = "ERROR";
         private const double A_FREQUENCY = 440.0;  //the A (la) note is 440hz
-        private const int MIDI_NOTES_SIZE = 127;
+        public const int MAX_MIDI_NOTES = 128;
 
-        private bool disposed;
         private int _deviceIndex;
         private MidiIn _device;
-        private string _inputDetails;
         private readonly double[] _midiNotes;
+        private bool _disposed;
 
         public Oscillator O1 { get; private set; }
         public Oscillator O2 { get; private set; }
         public Oscillator O3 { get; private set; }
         public int DeviceIndex { get => _deviceIndex; private set => _deviceIndex = value; }
         public MidiIn Device { get => _device; private set => _device = value; }
-        public string InputDetails { get => _inputDetails; set => _inputDetails = value; }
 
         public MIDIPlayer(int pDeviceIndex, Oscillator o1, Oscillator o2, Oscillator o3)
         {
@@ -38,7 +36,7 @@ namespace Synthsharp
 
             _midiNotes = ComputeMidiNotes();
 
-            disposed = false;
+            _disposed = false;
         }
 
         public void Start()
@@ -50,32 +48,40 @@ namespace Synthsharp
 
         private void MidiIn_ErrorReceived(object sender, MidiInMessageEventArgs e)
         {
-            InputDetails = MIDI_IN_MESSAGE_ERROR;
+            Debug.Print(MIDI_IN_MESSAGE_ERROR);
         }
 
         private void MidiIn_MessageReceived(object sender, MidiInMessageEventArgs e)
         {
             if (e.MidiEvent is NoteEvent ne)
             {
-                InputDetails = string.Format(" Time : {0} NoteName : {1} N° Key {2} ",
-                e.Timestamp, ne.NoteName, ne.NoteNumber);
-                int frequency = (int)_midiNotes[ne.NoteNumber];
-                Debug.Print($"Frequency: {frequency}, NoteNumber: {ne.NoteNumber}");
+                int noteNumber = ne.NoteNumber;
+                Debug.Print($"CommandCode: {ne.CommandCode}");
+                if(ne.CommandCode == MidiCommandCode.NoteOn)
+                {
+                    Debug.Print($"noteNumber: {noteNumber}");
+                    int frequency = (int)_midiNotes[noteNumber];
 
-                O1.Frequency = frequency;
-                O1.Play();
+                    O1.Frequency = frequency;
+                    O1.Play(noteNumber);
 
-                O2.Frequency = (int)_midiNotes[ne.NoteNumber];
-                O2.Play();
+                    O2.Frequency = frequency;
+                    O2.Play(noteNumber);
 
-                O3.Frequency = (int)_midiNotes[ne.NoteNumber];
-                O3.Play();
+                    O3.Frequency = frequency;
+                    O3.Play(noteNumber);
+                }
+                else if (ne.CommandCode == MidiCommandCode.NoteOff)
+                {
+                    O1.Stop(noteNumber);
+                    O2.Stop(noteNumber);
+                    O3.Stop(noteNumber);
+                }
+                
             }
             else if (e.MidiEvent is ControlChangeEvent cce)
             {
-                InputDetails = string.Format(" Time : {0} ControllerNumber : {1} ControllerValue {2} ",
-                e.Timestamp, cce.Controller, cce.ControllerValue);
-
+                //ControlChangeEvent
             }
         }
 
@@ -88,8 +94,8 @@ namespace Synthsharp
         /// <returns></returns>
         private double[] ComputeMidiNotes()
         {
-            double[] midiNotes = new double[MIDI_NOTES_SIZE];
-            for (int i = 0; i < MIDI_NOTES_SIZE; i++)
+            double[] midiNotes = new double[MAX_MIDI_NOTES];
+            for (int i = 0; i < MAX_MIDI_NOTES; i++)
             {
                 midiNotes[i] = (A_FREQUENCY / 32.0) * Math.Pow(2.0, ((i - 9.0) / 12.0));
             }
@@ -105,7 +111,7 @@ namespace Synthsharp
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (_disposed)
                 return;
 
             if (disposing)
@@ -116,7 +122,7 @@ namespace Synthsharp
             }
             //Dispose unmanaged objects
 
-            disposed = true;
+            _disposed = true;
         }
     }
 }

@@ -553,7 +553,6 @@
             this.Name = "SynthView";
             this.Text = "Synthsharp";
             this.Load += new System.EventHandler(this.SynthView_Load);
-            this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.SynthView_KeyUp);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trbOscillator1)).EndInit();
