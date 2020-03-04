@@ -1,35 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿/**
+ * @file MIDIPlayer.cs
+ * @author Gawen Ackermann (gawen.ackrm@eduge.ch), Jonathan Borel-Jaquet (jonathon.brljq@eduge.ch), Fabian Huber (fabian.hbr@eduge.ch)
+ * @brief File of the MIDIPlayer class.
+ * @version 1.0
+ * @date 04.03.2020
+ * 
+ * @copyright CFPT (c) 2020
+ * 
+ */
 using NAudio.Midi;
+using System;
+using System.Diagnostics;
 
 namespace Synthsharp
 {
-    class MIDIPlayer : IDisposable
+    /// <summary>
+    /// A class that can recieve midi events and play notes with the Oscillator class.
+    /// </summary>
+    public class MIDIPlayer : IDisposable
     {
         private const string MIDI_IN_MESSAGE_ERROR = "ERROR";
         private const double A_FREQUENCY = 440.0;  //the A (la) note is 440hz
         public const int MAX_MIDI_NOTES = 128;
 
-        private int _deviceIndex;
-        private MidiIn _device;
         private readonly double[] _midiNotes;
         private bool _disposed;
 
         public Oscillator O1 { get; private set; }
         public Oscillator O2 { get; private set; }
         public Oscillator O3 { get; private set; }
-        public int DeviceIndex { get => _deviceIndex; private set => _deviceIndex = value; }
-        public MidiIn Device { get => _device; private set => _device = value; }
+        public int DeviceIndex { get; private set; }
+        public MidiIn Device { get; private set; }
 
         public MIDIPlayer(int pDeviceIndex, Oscillator o1, Oscillator o2, Oscillator o3)
         {
             DeviceIndex = pDeviceIndex;
             Device = new MidiIn(DeviceIndex);
-            
+
             O1 = o1;
             O2 = o2;
             O3 = o3;
@@ -39,6 +46,9 @@ namespace Synthsharp
             _disposed = false;
         }
 
+        /// <summary>
+        /// Starts listening to midi events.
+        /// </summary>
         public void Start()
         {
             Device.MessageReceived += MidiIn_MessageReceived;
@@ -46,18 +56,26 @@ namespace Synthsharp
             Device.Start();
         }
 
+        /// <summary>
+        /// Method called when the device recieves an error. It prints an error message in the debug window.
+        /// </summary>
         private void MidiIn_ErrorReceived(object sender, MidiInMessageEventArgs e)
         {
             Debug.Print(MIDI_IN_MESSAGE_ERROR);
         }
 
+        /// <summary>
+        /// Method called when the device recieves a midi event. It plays the according note on the oscillators.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MidiIn_MessageReceived(object sender, MidiInMessageEventArgs e)
         {
             if (e.MidiEvent is NoteEvent ne)
             {
                 int noteNumber = ne.NoteNumber;
                 Debug.Print($"CommandCode: {ne.CommandCode}");
-                if(ne.CommandCode == MidiCommandCode.NoteOn)
+                if (ne.CommandCode == MidiCommandCode.NoteOn)
                 {
                     Debug.Print($"noteNumber: {noteNumber}");
                     int frequency = (int)_midiNotes[noteNumber];
@@ -77,7 +95,6 @@ namespace Synthsharp
                     O2.Stop(noteNumber);
                     O3.Stop(noteNumber);
                 }
-                
             }
             else if (e.MidiEvent is ControlChangeEvent cce)
             {
@@ -88,10 +105,10 @@ namespace Synthsharp
         /// <summary>
         /// Computes the frequency for the note number.
         /// Pass the note number as the index of the array.
-        /// 
+        ///
         /// This piece of code is from: http://subsynth.sourceforge.net/midinote2freq.html
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Returns an array where the key is the note number and the value is the frequency.</returns>
         private double[] ComputeMidiNotes()
         {
             double[] midiNotes = new double[MAX_MIDI_NOTES];

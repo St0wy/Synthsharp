@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using NAudio;
-using NAudio.Dsp;
+﻿/**
+ * @file Oscillator.cs
+ * @author Gawen Ackermann (gawen.ackrm@eduge.ch), Jonathan Borel-Jaquet (jonathon.brljq@eduge.ch), Fabian Huber (fabian.hbr@eduge.ch)
+ * @brief File of the Oscillator class.
+ * @version 1.0
+ * @date 04.03.2020
+ * 
+ * @copyright CFPT (c) 2020
+ * 
+ */
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using System;
 
 namespace Synthsharp
 {
+    /// <summary>
+    /// An class that can play a note with a certain frequency.
+    /// </summary>
     public class Oscillator : IDisposable
     {
         private const int DEFAULT_GAIN = 1;
@@ -19,18 +24,13 @@ namespace Synthsharp
         private const SignalGeneratorType DEFAULT_WAVE_TYPE = SignalGeneratorType.Sin;
         private const bool DEFAULT_ENBALED = true;
 
-        private double _gain;
-        private int _frequency;
-        private SignalGeneratorType _waveType;
-        private bool _isEnabled;
         private bool _disposed;
-        private WaveOut[] _waveOuts;
+        private readonly WaveOut[] _waveOuts;
 
-
-        public double Gain { get => _gain; set => _gain = value; }
-        public int Frequency { get => _frequency; set => _frequency = value; }
-        public SignalGeneratorType WaveType { get => _waveType; set => _waveType = value; }
-        public bool IsEnabled { get => _isEnabled; set => _isEnabled = value; }
+        public double Gain { get; set; }
+        public int Frequency { get; set; }
+        public SignalGeneratorType WaveType { get; set; }
+        public bool IsEnabled { get; set; }
 
         public Oscillator(double pGain, int pFrequency, SignalGeneratorType pType, bool isEnabled)
         {
@@ -49,7 +49,6 @@ namespace Synthsharp
 
         public Oscillator() : this(DEFAULT_GAIN, DEFAULT_FREQUENCY, DEFAULT_WAVE_TYPE, DEFAULT_ENBALED)
         {
-            
         }
 
         public void Play(int noteNumber)
@@ -70,7 +69,7 @@ namespace Synthsharp
 
         public void Stop(int noteNumber)
         {
-            if(IsEnabled)
+            if (IsEnabled)
                 _waveOuts[noteNumber].Stop();
         }
 
@@ -87,7 +86,7 @@ namespace Synthsharp
 
             if (disposing)
             {
-                //Dispose native and managed objects$
+                //Dispose native and managed objects
                 foreach (WaveOut waveOut in _waveOuts)
                 {
                     waveOut.Stop();
@@ -100,4 +99,3 @@ namespace Synthsharp
         }
     }
 }
-

@@ -1,22 +1,24 @@
-﻿using NAudio.Midi;
-using NAudio.Wave;
+﻿/**
+ * @file SynthView.cs
+ * @author Gawen Ackermann (gawen.ackrm@eduge.ch), Jonathan Borel-Jaquet (jonathon.brljq@eduge.ch), Fabian Huber (fabian.hbr@eduge.ch)
+ * @brief File of the SynthView class.
+ * @version 1.0
+ * @date 04.03.2020
+ * 
+ * @copyright CFPT (c) 2020
+ * 
+ */
+using NAudio.Midi;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-
 
 namespace Synthsharp
 {
-
+    /// <summary>
+    /// View of the Synthsharp project.
+    /// </summary>
     public partial class SynthView : Form
     {
         private const int OSCILLATOR_1 = 1;
@@ -33,15 +35,16 @@ namespace Synthsharp
 
         private const int DEFAULT_MIDI_DEVICE_ID = 0;
 
-        Oscillator o1;
-        Oscillator o2;
-        Oscillator o3;
+        private Oscillator o1;
+        private Oscillator o2;
+        private Oscillator o3;
 
-        readonly List<Button> Oscillator1Buttons;
-        readonly List<Button> Oscillator2Buttons;
-        readonly List<Button> Oscillator3Buttons;
+        private readonly List<Button> Oscillator1Buttons;
+        private readonly List<Button> Oscillator2Buttons;
+        private readonly List<Button> Oscillator3Buttons;
 
-        MIDIPlayer midiPlayer;
+        private MIDIPlayer midiPlayer;
+
         public SynthView()
         {
             InitializeComponent();
@@ -84,7 +87,6 @@ namespace Synthsharp
 
         private void UpdateView()
         {
-
         }
 
         /// <summary>
@@ -173,20 +175,17 @@ namespace Synthsharp
 
         private void ChkOnOscillator_CheckedChanged(object sender, EventArgs e)
         {
-
             CheckBox checkBox = sender as CheckBox;
             int tag = int.Parse(checkBox.Tag.ToString());
-            if(tag == OSCILLATOR_1)
+            if (tag == OSCILLATOR_1)
             {
                 //TODO Handle view desactivation
             }
             else if (tag == OSCILLATOR_2)
             {
-
             }
             else if (tag == OSCILLATOR_3)
             {
-
             }
 
             o1.IsEnabled = chkOnOscillator1.Checked;
@@ -218,7 +217,6 @@ namespace Synthsharp
                 cbxDevice.Items.Add(NO_DEVICE_DETECTED_MESSAGE);
             }
             cbxDevice.SelectedIndex = 0;
-
 
             if (midiPlayer != null)
             {
