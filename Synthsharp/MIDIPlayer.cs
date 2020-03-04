@@ -96,10 +96,6 @@ namespace Synthsharp
                     O3.Stop(noteNumber);
                 }
             }
-            else if (e.MidiEvent is ControlChangeEvent cce)
-            {
-                //ControlChangeEvent
-            }
         }
 
         /// <summary>

@@ -85,10 +85,6 @@ namespace Synthsharp
             }
         }
 
-        private void UpdateView()
-        {
-        }
-
         /// <summary>
         /// Initialize the combobox values
         /// </summary>
@@ -134,7 +130,7 @@ namespace Synthsharp
         private void ChangeWaveType(ref Oscillator oscillator, List<Button> buttons, SignalGeneratorType signalGeneratorType)
         {
             oscillator.WaveType = signalGeneratorType;
-            ManageButtonActivation(buttons, oscillator);
+            ManageButtonsActivation(buttons, oscillator);
         }
 
         private SignalGeneratorType GetSignalGeneratorType(char waveCode)
@@ -160,7 +156,7 @@ namespace Synthsharp
             return signalGeneratorType;
         }
 
-        private void ManageButtonActivation(List<Button> buttons, Oscillator oscillator)
+        private void ManageButtonsActivation(List<Button> buttons, Oscillator oscillator)
         {
             foreach (Button button in buttons)
             {
@@ -173,37 +169,40 @@ namespace Synthsharp
             }
         }
 
+        private void ManageEnabledActivation(List<Button> buttons, ref TrackBar trb, ref Oscillator oscillator, bool enabled)
+        {
+            oscillator.IsEnabled = enabled;
+            foreach (Button btn in buttons)
+            {
+                btn.Enabled = enabled;
+            }
+            trb.Enabled = enabled;
+
+            if (enabled)
+            {
+                ManageButtonsActivation(buttons, oscillator);
+            }
+        }
+
         private void ChkOnOscillator_CheckedChanged(object sender, EventArgs e)
         {
+            if (!(sender is CheckBox))
+                return;
+
             CheckBox checkBox = sender as CheckBox;
             int tag = int.Parse(checkBox.Tag.ToString());
             if (tag == OSCILLATOR_1)
             {
-                //TODO Handle view desactivation
+                ManageEnabledActivation(Oscillator1Buttons, ref trbOscillator1, ref o1, checkBox.Checked);
             }
             else if (tag == OSCILLATOR_2)
             {
+                ManageEnabledActivation(Oscillator2Buttons, ref trbOscillator2, ref o2, checkBox.Checked);
             }
             else if (tag == OSCILLATOR_3)
             {
+                ManageEnabledActivation(Oscillator3Buttons, ref trbOscillator3, ref o3, checkBox.Checked);
             }
-
-            o1.IsEnabled = chkOnOscillator1.Checked;
-        }
-
-        private void ChkOnOscillator1_CheckedChanged(object sender, EventArgs e)
-        {
-            o1.IsEnabled = chkOnOscillator1.Checked;
-        }
-
-        private void ChkOnOscillator2_CheckedChanged(object sender, EventArgs e)
-        {
-            o2.IsEnabled = chkOnOscillator2.Checked;
-        }
-
-        private void ChkOnOscillator3_CheckedChanged(object sender, EventArgs e)
-        {
-            o3.IsEnabled = chkOnOscillator3.Checked;
         }
 
         private void SynthView_Load(object sender, EventArgs e)
@@ -223,9 +222,9 @@ namespace Synthsharp
                 midiPlayer.Start();
             }
 
-            ManageButtonActivation(Oscillator1Buttons, o1);
-            ManageButtonActivation(Oscillator2Buttons, o2);
-            ManageButtonActivation(Oscillator3Buttons, o3);
+            ManageButtonsActivation(Oscillator1Buttons, o1);
+            ManageButtonsActivation(Oscillator2Buttons, o2);
+            ManageButtonsActivation(Oscillator3Buttons, o3);
         }
 
         private void CbxDevice_SelectedIndexChanged(object sender, EventArgs e)
@@ -243,6 +242,21 @@ namespace Synthsharp
                     midiPlayer = new MIDIPlayer(cbxDevice.SelectedIndex, o1, o2, o3);
                 }
             }
+        }
+
+        private void TrbOscillator1_Scroll(object sender, EventArgs e)
+        {
+            o1.Gain = (double)trbOscillator1.Value / trbOscillator1.Maximum;
+        }
+
+        private void TrbOscillator2_Scroll(object sender, EventArgs e)
+        {
+            o1.Gain = (double)trbOscillator2.Value / trbOscillator2.Maximum;
+        }
+
+        private void TrbOscillator3_Scroll(object sender, EventArgs e)
+        {
+            o1.Gain = (double)trbOscillator3.Value / trbOscillator3.Maximum;
         }
     }
 }
