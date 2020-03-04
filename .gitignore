@@ -338,4 +338,7 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-Synthsharp/Program.cs
+
+#Doxygen
+Synthsharp/latex/
+Synthsharp/html/
